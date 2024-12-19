@@ -1,5 +1,6 @@
 package com.example.practice.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,17 +19,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.practice.Product
+import com.example.practice.ProductViewModel
 
 @Composable
-fun Like(navController: NavController) {
+fun Like(navController: NavController,
+         viewModel: ProductViewModel = viewModel()
+) {
     var selectedItem by remember { mutableIntStateOf(1) } // 1은 하트 아이콘의 인덱스
     val items = listOf("", "", "")
     val selectedIcons = listOf(Icons.Filled.Home, Icons.Filled.Favorite, Icons.Filled.Person)
     val unselectedIcons = listOf(Icons.Outlined.Home, Icons.Outlined.FavoriteBorder, Icons.Outlined.Person)
+    val products by viewModel.products.collectAsState(initial = emptyList())
+
+    LaunchedEffect(Unit) {
+        viewModel.searchProductsByName("디퓨저") // 이 함수를 사용
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -64,7 +76,7 @@ fun Like(navController: NavController) {
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.weight(1f)
             ) {
-                items(likedProducts) { product ->
+                items(products) { product ->
                     LikedProductCard(product)
                 }
             }
@@ -112,11 +124,13 @@ fun Like(navController: NavController) {
     }
 }
 @Composable
-private fun LikedProductCard(product: ProductItem) {
+private fun LikedProductCard(product: Product) {
+    val uriHandler = LocalUriHandler.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp),
+            .height(120.dp)
+            .clickable { uriHandler.openUri(product.link) },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF2EDE4)
         ),
@@ -133,6 +147,7 @@ private fun LikedProductCard(product: ProductItem) {
                 modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                ImageCard(product.image_url)
 
                 Spacer(modifier = Modifier.width(16.dp))
 
@@ -154,6 +169,11 @@ private fun LikedProductCard(product: ProductItem) {
                             contentDescription = "rating",
                             modifier = Modifier.size(18.dp),
                             tint = Color(0xFFFFD700)
+                        )
+                        Text(
+                            text = product.rating,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(start = 4.dp)
                         )
                     }
 

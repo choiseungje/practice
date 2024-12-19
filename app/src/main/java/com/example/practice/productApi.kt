@@ -23,7 +23,7 @@ data class EcoInfo(
 
 interface ProductApi {
     @GET("/")
-    suspend fun getProducts(): List<Product>
+        suspend fun getProducts(): List<Product>
 
     @GET("/{name}")
     suspend fun getProductsByName(@Path("name") name: String): List<Product>

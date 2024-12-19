@@ -118,12 +118,7 @@ def read_products(db: Session = Depends(get_db)):
 @app.get("/{name}", response_model=List[dict])
 def read_products_by_name(name: str, db: Session = Depends(get_db)):
     # Product 테이블에서 이름에 검색어가 포함된 항목 검색
-    products = (
-        db.query(Product)
-        .filter(Product.name.contains(name))
-        .order_by(desc(Product.rating))
-        .all()
-    )
+    products = (db.query(Product).filter(Product.name.contains(name)).order_by(desc(Product.rating)).all())
 
     # JSON 형태로 변환
     return [
@@ -150,12 +145,7 @@ def read_products_by_name(name: str, db: Session = Depends(get_db)):
 
 @app.get("/{name}/{eco_check}", response_model=List[dict])
 def read_products_by_name_and_bool(name: str, eco_check: bool, db: Session = Depends(get_db)):
-    products = (
-        db.query(Product)
-        .filter(Product.name.contains(name))
-        .filter(Product.eco_check == eco_check)
-        .order_by(desc(Product.rating))
-        .all()
+    products = (db.query(Product).filter(Product.name.contains(name)).filter(Product.eco_check == eco_check).order_by(desc(Product.rating)).all()
     )
 
     # JSON 형태로 변환
